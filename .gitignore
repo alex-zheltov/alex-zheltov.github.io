@@ -1,0 +1,6 @@
+### Compile ###
+*/target
+
+### IntelliJ IDEA ###
+.idea
+*.iml
