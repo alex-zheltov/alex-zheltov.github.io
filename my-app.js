@@ -20,10 +20,27 @@ if ('Notification' in window) {
     });
 
     msg.onMessage(function(payload) {
-        navigator.serviceWorker.getRegistration('/firebase-cloud-messaging-push-scope').then((registration) => {
-            registration.showNotification(payload.notification.title, payload.notification);
+        console.log('Message received. ', payload);
+
+        // регистрируем пустой ServiceWorker каждый раз
+        navigator.serviceWorker.register('firebase-messaging-sw.js');
+
+        // запрашиваем права на показ уведомлений если еще не получили их
+        Notification.requestPermission(function(result) {
+            if (result === 'granted') {
+                navigator.serviceWorker.ready.then(function(registration) {
+                    // своя логика как в примере с TTL и т.д.
+
+                    // копируем объект data
+                    payload.data.data = JSON.parse(JSON.stringify(payload.data));
+
+                    registration.showNotification(payload.data.title, payload.data);
+                }).catch(function(error) {
+                    console.log('ServiceWorker registration failed', error);
+                });
+            }
         });
-    })
+    });
 }
 
 function subscribeUser() {
